@@ -1,0 +1,138 @@
+Configuring R-Lion:
+enable
+configure terminal
+hostname R-Lion
+
+! Configure INTERFACE TO ELEPHANT (Fiber Link)
+interface GigabitEthernet0/0/0
+ description Link to R-Elephant
+ ip address 10.0.12.145 255.255.255.252
+ no shutdown
+ exit
+
+! Configure INTERFACE TO LION LAN (Servers)
+interface GigabitEthernet0/1
+ description Lion Tribe LAN
+ ip address 10.0.12.129 255.255.255.240
+ no shutdown
+ exit
+
+! Static Routes (Pointing to Elephant)
+ip route 10.0.12.0 255.255.255.128 10.0.12.146
+ip route 10.0.8.0 255.255.252.0 10.0.12.146
+ip route 10.0.0.0 255.255.248.0 10.0.12.146
+ip route 10.0.12.148 255.255.255.252 10.0.12.146
+ip route 10.0.12.152 255.255.255.252 10.0.12.146
+exit
+write memory
+
+R-Elephant:
+enable
+configure terminal
+hostname R-Elephant
+
+! Configure INTERFACE TO LION (Fiber Link)
+interface GigabitEthernet0/0/0
+ description Link to R-Lion
+ ip address 10.0.12.146 255.255.255.252
+ no shutdown
+ exit
+
+! Configure INTERFACE TO CAT
+interface GigabitEthernet0/1
+ description Link to R-Cat
+ ip address 10.0.12.149 255.255.255.252
+ no shutdown
+ exit
+
+! Configure INTERFACE TO DOG
+interface GigabitEthernet0/2
+ description Link to R-Dog
+ ip address 10.0.12.153 255.255.255.252
+ no shutdown
+ exit
+
+! Configure INTERFACE TO ELEPHANT LAN (Moved to Gi0/0)
+interface GigabitEthernet0/0
+ description Elephant Tribe LAN
+ ip address 10.0.12.1 255.255.255.128
+ ip helper-address 10.0.12.133
+ no shutdown
+ exit
+
+! Configure OSPF Routing
+router ospf 1
+ router-id 2.2.2.2
+ network 10.0.12.0 0.0.0.127 area 0
+ network 10.0.12.148 0.0.0.3 area 0
+ network 10.0.12.152 0.0.0.3 area 0
+ passive-interface GigabitEthernet0/0/0
+ exit
+
+! Static Route Redistribute (To share Lion's path with Cat/Dog)
+ip route 10.0.12.128 255.255.255.240 10.0.12.145
+router ospf 1
+ redistribute static subnets
+ exit
+exit
+write memory
+
+
+R-Cat:
+enable
+configure terminal
+hostname R-Cat
+
+! Configure interface to Elephant
+interface GigabitEthernet0/0
+ description Link to R-Elephant
+ ip address 10.0.12.150 255.255.255.252
+ no shutdown
+ exit
+
+! Configure interface to Cat LAN
+interface GigabitEthernet0/1
+ description Cat Tribe LAN
+ ip address 10.0.8.1 255.255.252.0
+ ip helper-address 10.0.12.133
+ no shutdown
+ exit
+
+! Configure OSPF
+router ospf 1
+ router-id 3.3.3.3
+ network 10.0.8.0 0.0.3.255 area 0
+ network 10.0.12.148 0.0.0.3 area 0
+ exit
+exit
+write memory
+
+
+R-Dog:
+enable
+configure terminal
+hostname R-Dog
+
+! Configure interface to Elephant
+interface GigabitEthernet0/0
+ description Link to R-Elephant
+ ip address 10.0.12.154 255.255.255.252
+ no shutdown
+ exit
+
+! Configure interface to Dog LAN
+interface GigabitEthernet0/1
+ description Dog Tribe LAN
+ ip address 10.0.0.1 255.255.248.0
+ ip helper-address 10.0.12.133
+ no shutdown
+ exit
+
+! Configure OSPF
+router ospf 1
+ router-id 4.4.4.4
+ network 10.0.0.0 0.0.7.255 area 0
+ network 10.0.12.152 0.0.0.3 area 0
+ exit
+exit
+write memory

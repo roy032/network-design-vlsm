@@ -93,7 +93,7 @@ Drag **12x PC-PT** from **End Devices → End Devices**
 8. PC-Lion-2 Fa0 ↔ SW-Lion Fa0/8
 
 **Elephant Tribe Connections:**
-1. R-Elephant Gi1/0 ↔ SW-Elephant Fa0/1
+1. R-Elephant Gi0/0 ↔ SW-Elephant Fa0/1
 2. ElephantChief-PC Fa0 ↔ SW-Elephant Fa0/2
 3. PC-Elephant-1 Fa0 ↔ SW-Elephant Fa0/3
 4. PC-Elephant-2 Fa0 ↔ SW-Elephant Fa0/4
@@ -111,7 +111,7 @@ Drag **12x PC-PT** from **End Devices → End Devices**
 4. PC-Dog-2 Fa0 ↔ SW-Dog Fa0/4
 
 **Router-to-Router Connections:**
-1. R-Lion Gi0/0 ↔ R-Elephant Gi0/0
+1. R-Lion Gi0/0/0 ↔ R-Elephant Gi0/0
 2. R-Elephant Gi0/1 ↔ R-Cat Gi0/0
 3. R-Elephant Gi0/2 ↔ R-Dog Gi0/0
 
@@ -137,7 +137,7 @@ configure terminal
 hostname R-Lion
 
 ! Configure interface to Elephant
-interface GigabitEthernet0/0
+interface GigabitEthernet0/0/0
  description Link to R-Elephant
  ip address 10.0.12.145 255.255.255.252
  no shutdown
@@ -177,7 +177,7 @@ configure terminal
 hostname R-Elephant
 
 ! Configure interface to Lion
-interface GigabitEthernet0/0
+interface GigabitEthernet0/0/0
  description Link to R-Lion
  ip address 10.0.12.146 255.255.255.252
  no shutdown
@@ -198,7 +198,7 @@ interface GigabitEthernet0/2
  exit
 
 ! Configure interface to Elephant LAN
-interface GigabitEthernet1/0
+interface GigabitEthernet0/0
  description Elephant Tribe LAN
  ip address 10.0.12.1 255.255.255.128
  ip helper-address 10.0.12.133
@@ -211,7 +211,7 @@ router ospf 1
  network 10.0.12.0 0.0.0.127 area 0
  network 10.0.12.148 0.0.0.3 area 0
  network 10.0.12.152 0.0.0.3 area 0
- passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/0/0
  exit
 
 ! Static route to Lion and redistribute
@@ -742,12 +742,12 @@ Capture screenshots of:
 ### Router Interfaces
 | Router | Interface | IP | Subnet Mask | Description |
 |--------|-----------|-----|-------------|-------------|
-| R-Lion | Gi0/0 | 10.0.12.145 | 255.255.255.252 | To R-Elephant |
+| R-Lion | Gi0/0/0 | 10.0.12.145 | 255.255.255.252 | To R-Elephant |
 | R-Lion | Gi0/1 | 10.0.12.129 | 255.255.255.240 | Lion LAN |
-| R-Elephant | Gi0/0 | 10.0.12.146 | 255.255.255.252 | To R-Lion |
+| R-Elephant | Gi0/0/0 | 10.0.12.146 | 255.255.255.252 | To R-Lion |
 | R-Elephant | Gi0/1 | 10.0.12.149 | 255.255.255.252 | To R-Cat |
 | R-Elephant | Gi0/2 | 10.0.12.153 | 255.255.255.252 | To R-Dog |
-| R-Elephant | Gi1/0 | 10.0.12.1 | 255.255.255.128 | Elephant LAN |
+| R-Elephant | Gi0/0 | 10.0.12.1 | 255.255.255.128 | Elephant LAN |
 | R-Cat | Gi0/0 | 10.0.12.150 | 255.255.255.252 | To R-Elephant |
 | R-Cat | Gi0/1 | 10.0.8.1 | 255.255.252.0 | Cat LAN |
 | R-Dog | Gi0/0 | 10.0.12.154 | 255.255.255.252 | To R-Elephant |

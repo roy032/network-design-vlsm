@@ -38,7 +38,7 @@
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Router: R-Lion                                                 │
-│  ├─ GigabitEthernet0/0 (to Elephant): 10.0.12.145/30          │
+│  ├─ GigabitEthernet0/0/0 (to Elephant): 10.0.12.145/30          │
 │  └─ GigabitEthernet0/1 (LAN): 10.0.12.129/28                  │
 │                                                                 │
 │  Switch: SW-Lion (Layer 2)                                     │
@@ -65,10 +65,10 @@
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  Router: R-Elephant                                             │
-│  ├─ GigabitEthernet0/0 (to Lion): 10.0.12.146/30              │
+│  ├─ GigabitEthernet0/0/0 (to Lion): 10.0.12.146/30              │
 │  ├─ GigabitEthernet0/1 (to Cat): 10.0.12.149/30               │
 │  ├─ GigabitEthernet0/2 (to Dog): 10.0.12.153/30               │
-│  └─ GigabitEthernet1/0 (LAN): 10.0.12.1/25                    │
+│  └─ GigabitEthernet0/0 (LAN): 10.0.12.1/25                    │
 │                                                                 │
 │  Switch: SW-Elephant (Layer 2)                                 │
 │                                                                 │
@@ -136,8 +136,8 @@
 
 Point-to-Point Links:
 ├─ Lion ↔ Elephant: 10.0.12.144/30
-│  ├─ R-Lion Gi0/0: 10.0.12.145
-│  └─ R-Elephant Gi0/0: 10.0.12.146
+│  ├─ R-Lion Gi0/0/0: 10.0.12.145
+│  └─ R-Elephant Gi0/0/0: 10.0.12.146
 │
 ├─ Elephant ↔ Cat: 10.0.12.148/30
 │  ├─ R-Elephant Gi0/1: 10.0.12.149

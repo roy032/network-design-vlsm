@@ -61,7 +61,7 @@ No Packet Tracer needed. The script recomputes the VLSM plan from the host requi
 python tools/verify_design.py   # Python 3.8+, standard library only; exit code 1 on errors
 ```
 
-Current result: 0 errors, 3 warnings. The warnings are known doc/CLI mismatches: `terminal_commands.txt` uses `Gi0/0/0` for the Lion-Elephant link on both routers and `Gi0/0` for the Elephant LAN, while the docs list `Gi0/0` and `Gi1/0`. Check which one matches `project.pkt` and align the other.
+Current result: 0 errors, 0 warnings.
 
 ## Tools Used
 

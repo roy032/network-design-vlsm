@@ -33,70 +33,24 @@
 ## VLSM Tree Diagram
 
 ```
-                           10.0.0.0/8
-                                |
-              +-----------------+-----------------+
-              |                                   |
-         10.0.0.0/9                          10.128.0.0/9
-              |
-      +-------+-------+
-      |               |
-  10.0.0.0/10    10.64.0.0/10
-      |
-  +---+---+
-  |       |
-10.0.0.0/11  (unused)
-  |
-  +-------+-------+
-  |               |
-10.0.0.0/12   10.16.0.0/12
-  |
-  +---+---+
-  |       |
-10.0.0.0/20  10.0.16.0/20
-  |
-  +---+---+
-  |       |
-10.0.0.0/21  10.0.8.0/21      ← Dog Tribe (10.0.0.0/21)
-  |
-  +---+---+
-  |       |
-10.0.8.0/22  10.0.12.0/22     ← Cat Tribe (10.0.8.0/22)
-  |
-  +---+---+
-  |       |
-10.0.12.0/23  10.0.14.0/23
-  |
-  +---+---+
-  |       |
-10.0.12.0/24  10.0.13.0/24
-  |
-  +---+---+
-  |       |
-10.0.12.0/25  10.0.12.128/25  ← Elephant Tribe (10.0.12.0/25)
-  |
-  +---+---+
-  |       |
-10.0.12.128/26  10.0.12.192/26
-  |
-  +---+---+
-  |       |
-10.0.12.128/27  10.0.12.160/27
-  |
-  +---+---+
-  |       |
-10.0.12.128/28  10.0.12.144/28 ← Lion Tribe (10.0.12.128/28)
-  |
-  +---+---+
-  |       |
-10.0.12.144/29  10.0.12.152/29
-  |              |
-  +---+          +---+
-  |   |          |   |
-/30  /30       /30  /30
-Lion-Elephant  Elephant-Cat  Elephant-Dog
-10.0.12.144/30 10.0.12.148/30 10.0.12.152/30
+10.0.0.0/8
+└── 10.0.0.0/20  (first 4,096 addresses used; 10.0.16.0 onward free)
+    ├── 10.0.0.0/21        Dog       (1200 hosts -> 2046 usable)
+    └── 10.0.8.0/21
+        ├── 10.0.8.0/22    Cat       (800 hosts  -> 1022 usable)
+        └── 10.0.12.0/22
+            └── 10.0.12.0/24
+                ├── 10.0.12.0/25      Elephant  (100 hosts -> 126 usable)
+                └── 10.0.12.128/25
+                    ├── 10.0.12.128/28    Lion  (10 hosts -> 14 usable)
+                    └── 10.0.12.144/28
+                        ├── 10.0.12.144/30    Lion-Elephant link
+                        ├── 10.0.12.148/30    Elephant-Cat link
+                        ├── 10.0.12.152/30    Elephant-Dog link
+                        └── 10.0.12.156/30    free (spare /30 + 10.0.12.160/27 and up)
 ```
+
+Blocks are carved largest-first; intermediate split levels that hold no allocation are collapsed for readability. Allocation order is largest to smallest, so every block is aligned and nothing overlaps. `python tools/verify_design.py` recomputes this plan and checks it against the IP table.
 
 ---
 

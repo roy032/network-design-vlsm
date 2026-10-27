@@ -34,6 +34,8 @@ A comprehensive network infrastructure project for a fictional **Animal Kingdom*
 
 ```
 ├── README.md
+├── tools/
+│   └── verify_design.py                     # checks VLSM plan, IP table and router CLI
 ├── docs/
 │   ├── VLSM_Calculation.md
 │   ├── IP_Address_Table.md
@@ -50,6 +52,16 @@ A comprehensive network infrastructure project for a fictional **Animal Kingdom*
     ├── Verification_Commands_Documentation.md
     └── VLSM_Tree_for_Documentation.md
 ```
+
+## Verify the Design
+
+No Packet Tracer needed. The script recomputes the VLSM plan from the host requirements, checks every documented IP (usable host address, inside its subnet, no duplicates), compares router interface addresses in `deliverables/terminal_commands.txt` with the IP table, validates static-route next hops, and models OSPF adjacency and static redistribution to confirm every router can reach every LAN.
+
+```bash
+python tools/verify_design.py   # Python 3.8+, standard library only; exit code 1 on errors
+```
+
+Current result: 0 errors, 3 warnings. The warnings are known doc/CLI mismatches: `terminal_commands.txt` uses `Gi0/0/0` for the Lion-Elephant link on both routers and `Gi0/0` for the Elephant LAN, while the docs list `Gi0/0` and `Gi1/0`. Check which one matches `project.pkt` and align the other.
 
 ## Tools Used
 

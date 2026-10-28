@@ -37,7 +37,7 @@ graph TD
 |---|---:|---|---|
 | Dog | 1200 | 10.0.0.0/21 | OSPF |
 | Cat | 800 | 10.0.8.0/22 | OSPF |
-| Elephant | 100 | 10.0.12.0/25 | OSPF, plus a static route to Lion redistributed into OSPF |
+| Elephant | 100 | 10.0.12.0/25 | OSPF; redistributes its static route to Lion and its connected Lion link |
 | Lion | 3 PCs + 4 servers | 10.0.12.128/28 | Static only |
 
 Services: centralized **DHCP** (relayed by each tribe's router), **DNS** for `animals.com`,
@@ -72,7 +72,7 @@ pip install -e ".[dev]"      # or: make install
 
 vlsmkit plan 10.0.0.0/8 Dog=1200 Cat=800 Elephant=100 Lion=10 --format tree
 vlsmkit build                # regenerate configs/ and docs/generated/ from network.toml
-vlsmkit check                # CI gate: generated files current + all LANs reachable
+vlsmkit check                # CI gate: generated files current + every subnet reachable
 vlsmkit ping 10.0.0.2 10.0.12.130   # simulate DogChief-PC -> Web-Server
 vlsmkit routes R-Cat         # simulated `show ip route`
 
@@ -127,11 +127,11 @@ now fixed or documented, and tests guard against regressions.
 2. **Docs disagreed with the as-built lab.** The docs said the Lion-Elephant link used `Gi0/0`
    and the Elephant LAN used `Gi1/0`; the Packet Tracer file uses `Gi0/0/0` (fiber) and `Gi0/0`.
    All docs were corrected, and `tests/test_docs.py` now checks the IP table against the spec.
-3. **Open finding: the Lion-Elephant link (10.0.12.144/30) is not advertised into OSPF.**
-   Every LAN reaches every LAN, but Cat and Dog cannot ping R-Lion's or R-Elephant's link
-   addresses, which makes troubleshooting harder. The fix is one line on R-Elephant,
-   `redistribute connected subnets` under `router ospf 1`. A test proves this closes the gap.
-   It is not applied here so the configs keep matching the submitted `.pkt` file.
+3. **The Lion-Elephant link (10.0.12.144/30) was not advertised into OSPF.** Every LAN
+   reached every LAN, but Cat and Dog could not ping R-Lion's or R-Elephant's link addresses,
+   which makes troubleshooting harder. R-Elephant now runs `redistribute connected subnets`
+   under `router ospf 1`, and `vlsmkit check` requires every subnet, not just every LAN, to
+   be reachable. A regression test shows the gap returns without that line.
 
 ## Repository layout
 

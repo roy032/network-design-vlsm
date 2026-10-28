@@ -73,13 +73,12 @@ def cmd_check(args: argparse.Namespace) -> int:
                     n=1,
                 )
             )
-    lans = {s.id for s in network.lans}
     for (a, b), (req, rep) in reachability_matrix(network).items():
-        if a in lans and b in lans and not (req.ok and rep.ok):
+        if not (req.ok and rep.ok):
             ok = False
             print(f"UNREACHABLE {a} -> {b}: {req} | {rep}")
     print(
-        "OK: generated files are current and all LANs are reachable"
+        "OK: generated files are current and every subnet is reachable"
         if ok
         else "FAILED: run `vlsmkit build` and commit, or fix network.toml"
     )
@@ -118,7 +117,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     for name, func, help_text in [
         ("build", cmd_build, "generate configs and docs from the spec"),
-        ("check", cmd_check, "fail if generated files are stale or LANs are unreachable"),
+        ("check", cmd_check, "fail if generated files are stale or any subnet is unreachable"),
     ]:
         p = sub.add_parser(name, help=help_text)
         p.add_argument("--spec", default=DEFAULT_SPEC)

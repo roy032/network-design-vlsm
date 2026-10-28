@@ -50,16 +50,17 @@ def test_ping_dhcp_server_from_cat_chief(network: Network) -> None:
     assert reply.ok
 
 
-def test_known_gap_lion_elephant_link_not_advertised(network: Network) -> None:
-    """Design review finding: 10.0.12.144/30 is not in OSPF nor redistributed."""
-    request, _ = ping(network, IPv4Address("10.0.0.2"), IPv4Address("10.0.12.145"))
+def test_every_subnet_reaches_every_subnet(network: Network) -> None:
+    """Includes router link addresses, e.g. the Lion-Elephant /30."""
+    assert all(req.ok and rep.ok for req, rep in reachability_matrix(network).values())
+
+
+def test_lion_link_needs_connected_redistribution(raw_spec: dict[str, Any]) -> None:
+    """Regression: without it, 10.0.12.144/30 is unknown to Cat and Dog."""
+    raw_spec["routers"][1]["ospf"]["redistribute"] = ["static"]
+    gap = parse(raw_spec)
+    request, _ = ping(gap, IPv4Address("10.0.0.2"), IPv4Address("10.0.12.145"))
     assert request.outcome is Outcome.NO_ROUTE
-
-
-def test_redistribute_connected_closes_the_gap(raw_spec: dict[str, Any]) -> None:
-    raw_spec["routers"][1]["ospf"]["redistribute"] = ["static", "connected"]
-    fixed = parse(raw_spec)
-    assert all(req.ok and rep.ok for req, rep in reachability_matrix(fixed).values())
 
 
 def test_missing_redistribution_breaks_lion(raw_spec: dict[str, Any]) -> None:

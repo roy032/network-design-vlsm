@@ -213,16 +213,12 @@ def addressing_markdown(network: Network) -> str:
         for (a, b), (req, rep) in matrix.items()
         if not (req.ok and rep.ok)
     ]
-    lan_ids = {s.id for s in network.lans}
-    lan_ok = all(
-        req.ok and rep.ok for (a, b), (req, rep) in matrix.items() if a in lan_ids and b in lan_ids
-    )
     sections += [
         "## Reachability (simulated round-trip ping between subnets)",
         "Rows are sources, columns destinations. Each cell traces both the "
         "echo request and the reply through the simulated routing tables.",
         _table(["From \\ To", *(names[i] for i in ids)], rows),
-        f"**LAN to LAN reachability: {'PASS' if lan_ok else 'FAIL'}**",
+        f"**Every subnet reaches every subnet: {'FAIL' if failures else 'PASS'}**",
     ]
     if failures:
         sections += ["### Unreachable pairs", "\n".join(failures)]

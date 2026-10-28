@@ -37,6 +37,7 @@ router ospf 1
  network 10.0.12.152 0.0.0.3 area 0
  passive-interface GigabitEthernet0/0/0
  redistribute static subnets
+ redistribute connected subnets
  exit
 !
 end

@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VLSM Planner</title>
+<meta name="description" content="Interactive VLSM subnet calculator from the Animal Kingdom network design project.">
+<style>
+  :root {
+    --bg: #f7f7f5; --surface: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e2e2df;
+    --accent: #2f6fed; --accent-soft: #e6eefd; --danger: #c4372c; --danger-soft: #fdecea;
+    --free: #ecebe7; --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    --c1: #2f6fed; --c2: #1f9d74; --c3: #d9822b; --c4: #8a5cf6; --c5: #d64f7a; --c6: #3a9fbf; --c7: #7d8a2e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141416; --surface: #1d1d20; --text: #ececee; --muted: #9a9aa2; --border: #2e2e33;
+      --accent: #6c9cff; --accent-soft: #1f2a44; --danger: #ff7b6e; --danger-soft: #3a1f1d; --free: #2a2a2e;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+    font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, sans-serif; }
+  main { max-width: 1240px; margin: 0 auto; padding: 32px 16px 64px; }
+  header h1 { font-size: 28px; margin: 0 0 4px; letter-spacing: -0.02em; }
+  header p { margin: 0 0 24px; color: var(--muted); }
+  header a { color: var(--accent); }
+  .grid { display: grid; grid-template-columns: 340px minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+  .grid > *, .stack > * { min-width: 0; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px; }
+  .card h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 12px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 4px; }
+  input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--bg); color: var(--text); font: inherit; }
+  input:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  .mono, input.mono { font-family: var(--mono); font-size: 13.5px; }
+  .rows { display: grid; gap: 6px; margin: 14px 0 10px; }
+  .row { display: grid; grid-template-columns: 10px 1fr 86px 28px; gap: 6px; align-items: center; }
+  .swatch { width: 10px; height: 10px; border-radius: 3px; }
+  button { font: inherit; border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent); }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.icon { padding: 4px 0; width: 28px; color: var(--muted); }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+  .error { background: var(--danger-soft); color: var(--danger); border-radius: 8px; padding: 10px 12px;
+    font-size: 14px; }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 600px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } .stat b { font-size: 18px; } }
+  .stat { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px 14px; }
+  .stat b { display: block; overflow-wrap: anywhere; font-size: 19px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12.5px; color: var(--muted); }
+  .bar { display: flex; height: 34px; border-radius: 8px; overflow: hidden; background: var(--free);
+    border: 1px solid var(--border); }
+  .bar div { height: 100%; min-width: 2px; border-right: 1px solid var(--surface); }
+  .bar-legend { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 12px;
+    color: var(--muted); margin-top: 6px; }
+  .table-wrap { overflow-x: auto; margin-top: 4px; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+  th { text-align: left; font-weight: 600; color: var(--muted); font-size: 12px; text-transform: uppercase;
+    letter-spacing: .04em; padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 8px 10px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  tr:last-child td { border-bottom: 0; }
+  pre { margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; overflow-x: auto; }
+  .stack { display: grid; gap: 16px; }
+  footer { margin-top: 32px; color: var(--muted); font-size: 13px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>VLSM Planner</h1>
+    <p>Allocate right-sized subnets, largest first, with no overlap and no alignment gaps.
+      Part of the <a href="https://github.com/roy032/network-design-vlsm">Animal Kingdom network design</a>.</p>
+  </header>
+
+  <div class="grid">
+    <section class="card" aria-label="Requirements">
+      <h2>Requirements</h2>
+      <label for="supernet">Parent network</label>
+      <input id="supernet" class="mono" value="10.0.0.0/8" spellcheck="false" autocomplete="off">
+      <div class="rows" id="rows"></div>
+      <div class="toolbar">
+        <button id="add">+ Add subnet</button>
+        <button id="preset-ak">Animal Kingdom</button>
+        <button id="preset-office">Small office</button>
+      </div>
+    </section>
+
+    <section class="stack" aria-label="Results">
+      <div id="error" class="error" role="alert" hidden></div>
+      <div class="stack" id="results">
+      <div class="stats" id="stats"></div>
+      <div class="card">
+        <h2>Address space</h2>
+        <div class="bar" id="bar" role="img" aria-label="Allocated address space"></div>
+        <div class="bar-legend"><span id="bar-start"></span><span id="bar-end"></span></div>
+      </div>
+      <div class="card">
+        <h2>Subnet plan</h2>
+        <div class="table-wrap"><table id="plan"></table></div>
+        <div class="toolbar" style="margin-top:12px">
+          <button id="copy-csv">Copy CSV</button>
+          <button id="copy-json">Copy JSON</button>
+          <button id="copy-link">Copy share link</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>VLSM tree</h2>
+        <pre id="tree"></pre>
+      </div>
+      </div>
+    </section>
+  </div>
+  <footer>Runs entirely in your browser. The same algorithm powers the Python <code>vlsmkit</code> CLI,
+    and CI checks both produce identical plans.</footer>
+</main>
+
+<script type="module">
+import { allocate, intToIp, parseCidr } from "./vlsm.js";
+
+const PRESETS = {
+  ak: { supernet: "10.0.0.0/8", rows: [
+    ["Dog Tribe", 1200], ["Cat Tribe", 800], ["Elephant Tribe", 100], ["Lion Tribe", 10],
+    ["Lion-Elephant", 2], ["Elephant-Cat", 2], ["Elephant-Dog", 2]] },
+  office: { supernet: "192.168.0.0/22", rows: [
+    ["Staff", 300], ["Guests", 120], ["Servers", 25], ["Printers", 10], ["WAN link", 2]] },
+};
+const COLORS = ["--c1", "--c2", "--c3", "--c4", "--c5", "--c6", "--c7"];
+const $ = (id) => document.getElementById(id);
+const colorFor = (i) => `var(${COLORS[i % COLORS.length]})`;
+let state = { supernet: PRESETS.ak.supernet, rows: PRESETS.ak.rows.map((r) => [...r]) };
+let lastPlan = [];
+
+function loadFromHash() {
+  try {
+    const parsed = JSON.parse(decodeURIComponent(atob(location.hash.slice(1))));
+    if (parsed && typeof parsed.supernet === "string" && Array.isArray(parsed.rows)) state = parsed;
+  } catch { /* no or bad hash: keep the default preset */ }
+}
+const shareLink = () =>
+  `${location.origin}${location.pathname}#${btoa(encodeURIComponent(JSON.stringify(state)))}`;
+
+function renderRows() {
+  $("supernet").value = state.supernet;
+  $("rows").replaceChildren(...state.rows.map(([name, hosts], i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    row.innerHTML = `<span class="swatch" style="background:${colorFor(i)}"></span>
+      <input aria-label="Subnet name" value="">
+      <input aria-label="Hosts" class="mono" type="number" min="1" value="">
+      <button class="icon" aria-label="Remove">✕</button>`;
+    const [nameInput, hostsInput] = row.querySelectorAll("input");
+    nameInput.value = name;
+    hostsInput.value = hosts;
+    nameInput.addEventListener("input", () => { state.rows[i][0] = nameInput.value; compute(); });
+    hostsInput.addEventListener("input", () => { state.rows[i][1] = Number(hostsInput.value); compute(); });
+    row.querySelector("button").addEventListener("click", () => {
+      state.rows.splice(i, 1); renderRows(); compute();
+    });
+    return row;
+  }));
+}
+
+function tree(plan) {
+  const nets = plan.map((a) => ({ ...a }));
+  let root = { start: nets[0].start, size: nets[0].size };
+  const inside = (a, b) => a.start >= b.start && a.start + a.size <= b.start + b.size;
+  while (!nets.every((a) => inside(a, root))) {
+    root = { size: root.size * 2, start: Math.floor(root.start / (root.size * 2)) * root.size * 2 };
+  }
+  const prefixOf = (size) => 32 - Math.log2(size);
+  const lines = [];
+  const walk = (block, pad, conn) => {
+    const exact = nets.find((a) => a.start === block.start && a.size === block.size);
+    const overlaps = nets.some((a) => a.start < block.start + block.size && block.start < a.start + a.size);
+    let label = `${intToIp(block.start)}/${prefixOf(block.size)}`;
+    if (exact) label += `  <- ${exact.name} (${exact.hostsRequired} hosts, ${exact.usableHosts} usable)`;
+    else if (!overlaps) label += "  (free)";
+    lines.push(pad + conn + label);
+    if (exact || !nets.some((a) => inside(a, block)) || block.size === 1) return;
+    const childPad = conn ? pad + (conn === "└── " ? "    " : "│   ") : pad;
+    const half = block.size / 2;
+    walk({ start: block.start, size: half }, childPad, "├── ");
+    walk({ start: block.start + half, size: half }, childPad, "└── ");
+  };
+  walk(root, "", "");
+  return { text: lines.join("\n"), root };
+}
+
+function compute() {
+  state.supernet = $("supernet").value;
+  const requests = state.rows.map(([name, hosts]) => ({ name: String(name).trim(), hosts: Number(hosts) }));
+  try {
+    if (!requests.length) throw new Error("add at least one subnet");
+    lastPlan = allocate(state.supernet, requests);
+    $("error").hidden = true;
+    $("results").style.opacity = 1;
+    render(lastPlan);
+    history.replaceState(null, "", shareLink());
+  } catch (err) {
+    $("error").textContent = err.message;
+    $("error").hidden = false;
+    $("results").style.opacity = 0.45;
+  }
+}
+
+function render(plan) {
+  const index = new Map(state.rows.map(([name], i) => [String(name).trim(), i]));
+  const parent = parseCidr(state.supernet);
+  const { text, root } = tree(plan);
+  const used = plan.reduce((s, a) => s + a.size, 0);
+  const requested = plan.reduce((s, a) => s + a.hostsRequired, 0);
+  const usable = plan.reduce((s, a) => s + a.usableHosts, 0);
+  const fmt = (n) => n.toLocaleString("en-US");
+  $("stats").innerHTML = [
+    [plan.length, "subnets"],
+    [`${intToIp(root.start)}/${32 - Math.log2(root.size)}`, "covering block"],
+    [`${((requested / usable) * 100).toFixed(1)}%`, "host efficiency"],
+    [fmt(parent.size - used), "addresses left in parent"],
+  ].map(([v, l]) => `<div class="stat"><b class="mono">${v}</b><span>${l}</span></div>`).join("");
+
+  const bar = $("bar");
+  bar.replaceChildren();
+  let cursor = root.start;
+  for (const a of [...plan].sort((x, y) => x.start - y.start)) {
+    if (a.start > cursor) bar.append(Object.assign(document.createElement("div"), {
+      style: `flex:${a.start - cursor};background:var(--free)`, title: "free" }));
+    bar.append(Object.assign(document.createElement("div"), {
+      style: `flex:${a.size};background:${colorFor(index.get(a.name) ?? 0)}`, title: `${a.name}: ${a.network}` }));
+    cursor = a.start + a.size;
+  }
+  if (cursor < root.start + root.size) bar.append(Object.assign(document.createElement("div"), {
+    style: `flex:${root.start + root.size - cursor};background:var(--free)`, title: "free" }));
+  $("bar-start").textContent = intToIp(root.start);
+  $("bar-end").textContent = intToIp(root.start + root.size - 1);
+
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+  $("plan").innerHTML = `<thead><tr><th></th><th>Subnet</th><th>Hosts</th><th>Usable</th><th>Network</th>
+    <th>Mask</th><th>Wildcard</th><th>Usable range</th><th>Broadcast</th></tr></thead><tbody>` +
+    plan.map((a) => `<tr><td><span class="swatch" style="display:inline-block;background:${colorFor(index.get(a.name) ?? 0)}"></span></td>
+      <td>${esc(a.name)}</td><td class="num">${fmt(a.hostsRequired)}</td><td class="num">${fmt(a.usableHosts)}</td>
+      <td class="mono">${a.network}</td><td class="mono">${a.netmask}</td><td class="mono">${a.wildcard}</td>
+      <td class="mono">${a.firstHost} – ${a.lastHost}</td><td class="mono">${a.broadcast}</td></tr>`).join("") +
+    "</tbody>";
+  $("tree").textContent = text;
+}
+
+async function copy(button, text) {
+  try { await navigator.clipboard.writeText(text); } catch { return; }
+  const label = button.textContent;
+  button.textContent = "Copied";
+  setTimeout(() => (button.textContent = label), 1200);
+}
+
+$("supernet").addEventListener("input", compute);
+$("add").addEventListener("click", () => { state.rows.push([`Subnet ${state.rows.length + 1}`, 10]); renderRows(); compute(); });
+for (const [id, key] of [["preset-ak", "ak"], ["preset-office", "office"]]) {
+  $(id).addEventListener("click", () => {
+    state = { supernet: PRESETS[key].supernet, rows: PRESETS[key].rows.map((r) => [...r]) };
+    renderRows(); compute();
+  });
+}
+$("copy-csv").addEventListener("click", (e) => copy(e.target,
+  ["name,hosts,usable,network,netmask,first,last,broadcast",
+   ...lastPlan.map((a) => [a.name, a.hostsRequired, a.usableHosts, a.network, a.netmask, a.firstHost, a.lastHost, a.broadcast].join(","))].join("\n")));
+$("copy-json").addEventListener("click", (e) => copy(e.target, JSON.stringify(lastPlan, null, 2)));
+$("copy-link").addEventListener("click", (e) => copy(e.target, shareLink()));
+
+loadFromHash();
+renderRows();
+compute();
+</script>
+</body>
+</html>

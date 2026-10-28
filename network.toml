@@ -1,0 +1,169 @@
+# Animal Kingdom network: the single source of truth.
+#
+# Every addressing table, router config and reachability report in this
+# repository is generated from this file by `vlsmkit build`. Edit this file,
+# then run `make build` (CI fails if generated files are out of date).
+
+[network]
+name = "Animal Kingdom"
+supernet = "10.0.0.0/8"
+domain = "animals.com"
+
+# ---------------------------------------------------------------------------
+# Subnets. `hosts` is the requirement; the prefix is computed by VLSM.
+# ---------------------------------------------------------------------------
+
+[[subnets]]
+id = "dog-lan"
+name = "Dog Tribe"
+hosts = 1200
+dhcp = { pool = "DOG-POOL", exclude_first = 9 }
+
+[[subnets]]
+id = "cat-lan"
+name = "Cat Tribe"
+hosts = 800
+dhcp = { pool = "CAT-POOL", exclude_first = 9 }
+
+[[subnets]]
+id = "elephant-lan"
+name = "Elephant Tribe"
+hosts = 100
+dhcp = { pool = "ELE-POOL", exclude_first = 9 }
+
+[[subnets]]
+id = "lion-lan"
+name = "Lion Tribe"
+hosts = 10        # 3 PCs + 4 servers + gateway, with headroom
+
+[[subnets]]
+id = "lion-elephant"
+name = "Lion-Elephant"
+hosts = 2
+
+[[subnets]]
+id = "elephant-cat"
+name = "Elephant-Cat"
+hosts = 2
+
+[[subnets]]
+id = "elephant-dog"
+name = "Elephant-Dog"
+hosts = 2
+
+# ---------------------------------------------------------------------------
+# Routers. `host = N` means the N-th usable address of the subnet.
+# Interface names match the as-built Packet Tracer file (deliverables/project.pkt).
+# ---------------------------------------------------------------------------
+
+[[routers]]
+hostname = "R-Lion"
+interfaces = [
+  { name = "GigabitEthernet0/0/0", subnet = "lion-elephant", host = 1, description = "Link to R-Elephant" },
+  { name = "GigabitEthernet0/1", subnet = "lion-lan", host = 1, description = "Lion Tribe LAN" },
+]
+# The Lion tribe uses static routing only: everything else is via R-Elephant.
+static_routes = [
+  { to = "elephant-lan", via = "R-Elephant" },
+  { to = "cat-lan", via = "R-Elephant" },
+  { to = "dog-lan", via = "R-Elephant" },
+  { to = "elephant-cat", via = "R-Elephant" },
+  { to = "elephant-dog", via = "R-Elephant" },
+]
+
+[[routers]]
+hostname = "R-Elephant"
+interfaces = [
+  { name = "GigabitEthernet0/0/0", subnet = "lion-elephant", host = 2, description = "Link to R-Lion" },
+  { name = "GigabitEthernet0/1", subnet = "elephant-cat", host = 1, description = "Link to R-Cat" },
+  { name = "GigabitEthernet0/2", subnet = "elephant-dog", host = 1, description = "Link to R-Dog" },
+  { name = "GigabitEthernet0/0", subnet = "elephant-lan", host = 1, description = "Elephant Tribe LAN", dhcp_relay = "DHCP-Server" },
+]
+static_routes = [
+  { to = "lion-lan", via = "R-Lion" },
+]
+ospf = { process = 1, router_id = "2.2.2.2", area = 0, networks = ["elephant-lan", "elephant-cat", "elephant-dog"], passive = ["GigabitEthernet0/0/0"], redistribute = ["static"] }
+
+[[routers]]
+hostname = "R-Cat"
+interfaces = [
+  { name = "GigabitEthernet0/0", subnet = "elephant-cat", host = 2, description = "Link to R-Elephant" },
+  { name = "GigabitEthernet0/1", subnet = "cat-lan", host = 1, description = "Cat Tribe LAN", dhcp_relay = "DHCP-Server" },
+]
+ospf = { process = 1, router_id = "3.3.3.3", area = 0, networks = ["cat-lan", "elephant-cat"] }
+
+[[routers]]
+hostname = "R-Dog"
+interfaces = [
+  { name = "GigabitEthernet0/0", subnet = "elephant-dog", host = 2, description = "Link to R-Elephant" },
+  { name = "GigabitEthernet0/1", subnet = "dog-lan", host = 1, description = "Dog Tribe LAN", dhcp_relay = "DHCP-Server" },
+]
+ospf = { process = 1, router_id = "4.4.4.4", area = 0, networks = ["dog-lan", "elephant-dog"] }
+
+# ---------------------------------------------------------------------------
+# Statically addressed end hosts and servers.
+# ---------------------------------------------------------------------------
+
+[[hosts]]
+name = "Web-Server"
+subnet = "lion-lan"
+host = 2
+role = "HTTP server for www.animals.com"
+dns = ["www", "@"]
+
+[[hosts]]
+name = "DNS-Server"
+subnet = "lion-lan"
+host = 3
+role = "DNS server for animals.com"
+dns = ["dns"]
+
+[[hosts]]
+name = "Email-Server"
+subnet = "lion-lan"
+host = 4
+role = "SMTP/POP3 server"
+dns = ["mail"]
+mx = true
+
+[[hosts]]
+name = "DHCP-Server"
+subnet = "lion-lan"
+host = 5
+role = "Central DHCP for all tribes"
+
+[[hosts]]
+name = "LionKing-PC"
+subnet = "lion-lan"
+host = 6
+role = "Chief (lionking@animals.com)"
+
+[[hosts]]
+name = "PC-Lion-1"
+subnet = "lion-lan"
+host = 7
+role = "End device"
+
+[[hosts]]
+name = "PC-Lion-2"
+subnet = "lion-lan"
+host = 8
+role = "End device"
+
+[[hosts]]
+name = "ElephantChief-PC"
+subnet = "elephant-lan"
+host = 2
+role = "Chief (elephantchief@animals.com)"
+
+[[hosts]]
+name = "CatChief-PC"
+subnet = "cat-lan"
+host = 2
+role = "Chief (catchief@animals.com)"
+
+[[hosts]]
+name = "DogChief-PC"
+subnet = "dog-lan"
+host = 2
+role = "Chief (dogchief@animals.com)"

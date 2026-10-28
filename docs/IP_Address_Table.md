@@ -20,7 +20,7 @@
 
 | Device Name      | Interface/Type | IP Address    | Subnet Mask     | Default Gateway | Description                |
 |------------------|----------------|---------------|-----------------|-----------------|----------------------------|
-| R-Lion           | Gi0/0          | 10.0.12.145   | 255.255.255.252 | N/A             | To R-Elephant              |
+| R-Lion           | Gi0/0/0        | 10.0.12.145   | 255.255.255.252 | N/A             | To R-Elephant              |
 | R-Lion           | Gi0/1          | 10.0.12.129   | 255.255.255.240 | N/A             | Lion LAN (Gateway)         |
 | DNS-Server       | FastEthernet   | 10.0.12.131   | 255.255.255.240 | 10.0.12.129     | DNS Server (animals.com)   |
 | Web-Server       | FastEthernet   | 10.0.12.130   | 255.255.255.240 | 10.0.12.129     | www.animals.com            |
@@ -39,10 +39,10 @@
 
 | Device Name        | Interface/Type | IP Address    | Subnet Mask     | Default Gateway | Description                |
 |--------------------|----------------|---------------|-----------------|-----------------|----------------------------|
-| R-Elephant         | Gi0/0          | 10.0.12.146   | 255.255.255.252 | N/A             | To R-Lion                  |
+| R-Elephant         | Gi0/0/0        | 10.0.12.146   | 255.255.255.252 | N/A             | To R-Lion                  |
 | R-Elephant         | Gi0/1          | 10.0.12.149   | 255.255.255.252 | N/A             | To R-Cat                   |
 | R-Elephant         | Gi0/2          | 10.0.12.153   | 255.255.255.252 | N/A             | To R-Dog                   |
-| R-Elephant         | Gi1/0          | 10.0.12.1     | 255.255.255.128 | N/A             | Elephant LAN (Gateway)     |
+| R-Elephant         | Gi0/0          | 10.0.12.1     | 255.255.255.128 | N/A             | Elephant LAN (Gateway)     |
 | ElephantChief-PC   | FastEthernet   | 10.0.12.2     | 255.255.255.128 | 10.0.12.1       | Chief (elephantchief@...)  |
 | PC-Elephant-1      | FastEthernet   | DHCP          | DHCP            | DHCP            | End device                 |
 | PC-Elephant-2      | FastEthernet   | DHCP          | DHCP            | DHCP            | End device                 |
@@ -99,7 +99,7 @@
 
 | Router     | Interface | Helper Address |
 |------------|-----------|----------------|
-| R-Elephant | Gi1/0     | 10.0.12.133    |
+| R-Elephant | Gi0/0     | 10.0.12.133    |
 | R-Cat      | Gi0/1     | 10.0.12.133    |
 | R-Dog      | Gi0/1     | 10.0.12.133    |
 
@@ -140,14 +140,14 @@
 
 ```
 R-Lion (10.0.12.145, 10.0.12.129)
-├─ Gi0/0: 10.0.12.145/30 → R-Elephant Gi0/0
+├─ Gi0/0/0: 10.0.12.145/30 → R-Elephant Gi0/0/0
 └─ Gi0/1: 10.0.12.129/28 → Lion LAN
 
 R-Elephant (10.0.12.146, 10.0.12.149, 10.0.12.153, 10.0.12.1)
-├─ Gi0/0: 10.0.12.146/30 → R-Lion Gi0/0
+├─ Gi0/0/0: 10.0.12.146/30 → R-Lion Gi0/0/0
 ├─ Gi0/1: 10.0.12.149/30 → R-Cat Gi0/0
 ├─ Gi0/2: 10.0.12.153/30 → R-Dog Gi0/0
-└─ Gi1/0: 10.0.12.1/25 → Elephant LAN
+└─ Gi0/0: 10.0.12.1/25 → Elephant LAN
 
 R-Cat (10.0.12.150, 10.0.8.1)
 ├─ Gi0/0: 10.0.12.150/30 → R-Elephant Gi0/1

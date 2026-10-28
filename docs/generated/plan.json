@@ -1,0 +1,79 @@
+[
+  {
+    "name": "dog-lan",
+    "hosts_required": 1200,
+    "usable_hosts": 2046,
+    "network": "10.0.0.0/21",
+    "netmask": "255.255.248.0",
+    "wildcard": "0.0.7.255",
+    "first_host": "10.0.0.1",
+    "last_host": "10.0.7.254",
+    "broadcast": "10.0.7.255"
+  },
+  {
+    "name": "cat-lan",
+    "hosts_required": 800,
+    "usable_hosts": 1022,
+    "network": "10.0.8.0/22",
+    "netmask": "255.255.252.0",
+    "wildcard": "0.0.3.255",
+    "first_host": "10.0.8.1",
+    "last_host": "10.0.11.254",
+    "broadcast": "10.0.11.255"
+  },
+  {
+    "name": "elephant-lan",
+    "hosts_required": 100,
+    "usable_hosts": 126,
+    "network": "10.0.12.0/25",
+    "netmask": "255.255.255.128",
+    "wildcard": "0.0.0.127",
+    "first_host": "10.0.12.1",
+    "last_host": "10.0.12.126",
+    "broadcast": "10.0.12.127"
+  },
+  {
+    "name": "lion-lan",
+    "hosts_required": 10,
+    "usable_hosts": 14,
+    "network": "10.0.12.128/28",
+    "netmask": "255.255.255.240",
+    "wildcard": "0.0.0.15",
+    "first_host": "10.0.12.129",
+    "last_host": "10.0.12.142",
+    "broadcast": "10.0.12.143"
+  },
+  {
+    "name": "lion-elephant",
+    "hosts_required": 2,
+    "usable_hosts": 2,
+    "network": "10.0.12.144/30",
+    "netmask": "255.255.255.252",
+    "wildcard": "0.0.0.3",
+    "first_host": "10.0.12.145",
+    "last_host": "10.0.12.146",
+    "broadcast": "10.0.12.147"
+  },
+  {
+    "name": "elephant-cat",
+    "hosts_required": 2,
+    "usable_hosts": 2,
+    "network": "10.0.12.148/30",
+    "netmask": "255.255.255.252",
+    "wildcard": "0.0.0.3",
+    "first_host": "10.0.12.149",
+    "last_host": "10.0.12.150",
+    "broadcast": "10.0.12.151"
+  },
+  {
+    "name": "elephant-dog",
+    "hosts_required": 2,
+    "usable_hosts": 2,
+    "network": "10.0.12.152/30",
+    "netmask": "255.255.255.252",
+    "wildcard": "0.0.0.3",
+    "first_host": "10.0.12.153",
+    "last_host": "10.0.12.154",
+    "broadcast": "10.0.12.155"
+  }
+]

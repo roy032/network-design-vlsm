@@ -15,7 +15,7 @@ configure terminal
 hostname R-Lion
 
 ! Configure interface to Elephant (Point-to-Point)
-interface GigabitEthernet0/0
+interface GigabitEthernet0/0/0
  description Link to R-Elephant
  ip address 10.0.12.145 255.255.255.252
  no shutdown
@@ -71,7 +71,7 @@ configure terminal
 hostname R-Elephant
 
 ! Configure interface to Lion (Point-to-Point)
-interface GigabitEthernet0/0
+interface GigabitEthernet0/0/0
  description Link to R-Lion
  ip address 10.0.12.146 255.255.255.252
  no shutdown
@@ -92,7 +92,7 @@ interface GigabitEthernet0/2
  exit
 
 ! Configure interface to Elephant LAN
-interface GigabitEthernet1/0
+interface GigabitEthernet0/0
  description Elephant Tribe LAN
  ip address 10.0.12.1 255.255.255.128
  no shutdown
@@ -101,7 +101,7 @@ interface GigabitEthernet1/0
 ! ============================================
 ! DHCP RELAY - Forward DHCP requests to Lion
 ! ============================================
-interface GigabitEthernet1/0
+interface GigabitEthernet0/0
  ip helper-address 10.0.12.133
  exit
 
@@ -113,7 +113,7 @@ router ospf 1
  network 10.0.12.0 0.0.0.127 area 0
  network 10.0.12.148 0.0.0.3 area 0
  network 10.0.12.152 0.0.0.3 area 0
- passive-interface GigabitEthernet0/0
+ passive-interface GigabitEthernet0/0/0
  exit
 
 ! ============================================
@@ -278,12 +278,12 @@ ping 10.0.12.133    ! Ping DHCP Server
 ## Configuration Summary
 
 ### R-Lion (Static Routing)
-- **Interfaces**: Gi0/0 (to Elephant), Gi0/1 (LAN)
+- **Interfaces**: Gi0/0/0 (to Elephant), Gi0/1 (LAN)
 - **Routing**: Static routes to all networks
 - **Special**: No dynamic routing protocols
 
 ### R-Elephant (OSPF + Static)
-- **Interfaces**: Gi0/0 (to Lion), Gi0/1 (to Cat), Gi0/2 (to Dog), Gi1/0 (LAN)
+- **Interfaces**: Gi0/0/0 (to Lion), Gi0/1 (to Cat), Gi0/2 (to Dog), Gi0/0 (LAN)
 - **Routing**: OSPF for Cat/Dog/Elephant networks, Static for Lion
 - **Special**: DHCP relay, redistributes static routes into OSPF
 

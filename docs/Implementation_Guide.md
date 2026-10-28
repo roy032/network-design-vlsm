@@ -53,7 +53,7 @@
 - PC-Lion-2 FastEthernet0 → SW-Lion FastEthernet0/8
 
 #### Elephant Tribe
-- SW-Elephant FastEthernet0/1 → R-Elephant GigabitEthernet1/0
+- SW-Elephant FastEthernet0/1 → R-Elephant GigabitEthernet0/0
 - ElephantChief-PC FastEthernet0 → SW-Elephant FastEthernet0/2
 - PC-Elephant-1 FastEthernet0 → SW-Elephant FastEthernet0/3
 - PC-Elephant-2 FastEthernet0 → SW-Elephant FastEthernet0/4
@@ -71,7 +71,7 @@
 - PC-Dog-2 FastEthernet0 → SW-Dog FastEthernet0/4
 
 #### Router-to-Router Links
-- R-Lion GigabitEthernet0/0 → R-Elephant GigabitEthernet0/0
+- R-Lion GigabitEthernet0/0/0 → R-Elephant GigabitEthernet0/0/0
 - R-Elephant GigabitEthernet0/1 → R-Cat GigabitEthernet0/0
 - R-Elephant GigabitEthernet0/2 → R-Dog GigabitEthernet0/0
 
@@ -95,7 +95,7 @@
 enable
 configure terminal
 hostname R-Lion
-interface GigabitEthernet0/0
+interface GigabitEthernet0/0/0
  description Link to R-Elephant
  ip address 10.0.12.145 255.255.255.252
  no shutdown
@@ -120,8 +120,8 @@ write memory
 2. Enter the full configuration from `Router_Configurations.md`
 
 **Key sections:**
-- Configure all 4 interfaces (Gi0/0, Gi0/1, Gi0/2, Gi1/0)
-- Set up DHCP relay on Gi1/0
+- Configure all 4 interfaces (Gi0/0/0, Gi0/1, Gi0/2, Gi0/0)
+- Set up DHCP relay on Gi0/0
 - Configure OSPF
 - Add static route to Lion
 - Redistribute static routes

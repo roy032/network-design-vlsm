@@ -20,7 +20,7 @@
 
 | Device Name      | Interface/Type | IP Address    | Subnet Mask     | Default Gateway | Description                |
 |------------------|----------------|---------------|-----------------|-----------------|----------------------------|
-| R-Lion           | Gi0/0/0          | 10.0.12.145   | 255.255.255.252 | N/A             | To R-Elephant              |
+| R-Lion           | Gi0/0/0        | 10.0.12.145   | 255.255.255.252 | N/A             | To R-Elephant              |
 | R-Lion           | Gi0/1          | 10.0.12.129   | 255.255.255.240 | N/A             | Lion LAN (Gateway)         |
 | DNS-Server       | FastEthernet   | 10.0.12.131   | 255.255.255.240 | 10.0.12.129     | DNS Server (animals.com)   |
 | Web-Server       | FastEthernet   | 10.0.12.130   | 255.255.255.240 | 10.0.12.129     | www.animals.com            |
@@ -39,7 +39,7 @@
 
 | Device Name        | Interface/Type | IP Address    | Subnet Mask     | Default Gateway | Description                |
 |--------------------|----------------|---------------|-----------------|-----------------|----------------------------|
-| R-Elephant         | Gi0/0/0          | 10.0.12.146   | 255.255.255.252 | N/A             | To R-Lion                  |
+| R-Elephant         | Gi0/0/0        | 10.0.12.146   | 255.255.255.252 | N/A             | To R-Lion                  |
 | R-Elephant         | Gi0/1          | 10.0.12.149   | 255.255.255.252 | N/A             | To R-Cat                   |
 | R-Elephant         | Gi0/2          | 10.0.12.153   | 255.255.255.252 | N/A             | To R-Dog                   |
 | R-Elephant         | Gi0/0          | 10.0.12.1     | 255.255.255.128 | N/A             | Elephant LAN (Gateway)     |

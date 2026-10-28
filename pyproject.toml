@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vlsmkit"
+dynamic = ["version"]
+description = "VLSM planner, Cisco IOS config generator and routing verifier for the Animal Kingdom network design."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "roy032" }]
+keywords = ["vlsm", "subnetting", "cisco", "ospf", "networking", "packet-tracer"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Topic :: System :: Networking",
+  "Typing :: Typed",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-cov>=5", "hypothesis>=6.100", "ruff>=0.6", "mypy>=1.10"]
+
+[project.scripts]
+vlsmkit = "vlsmkit.cli:main"
+
+[project.urls]
+Repository = "https://github.com/roy032/network-design-vlsm"
+
+[tool.hatch.version]
+path = "src/vlsmkit/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vlsmkit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "src"]
+addopts = "-ra --strict-markers --doctest-modules --cov=vlsmkit --cov-report=term-missing --cov-fail-under=95"
+pythonpath = ["src"]
+
+[tool.coverage.run]
+source = ["src/vlsmkit"]
+branch = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF", "N", "C4", "PT", "RET"]
+
+[tool.mypy]
+strict = true
+python_version = "3.11"
+mypy_path = "src"
+files = ["src", "tests"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_decorators = false

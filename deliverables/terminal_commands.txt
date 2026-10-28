@@ -73,6 +73,7 @@ router ospf 1
 ip route 10.0.12.128 255.255.255.240 10.0.12.145
 router ospf 1
  redistribute static subnets
+ redistribute connected subnets
  exit
 exit
 write memory

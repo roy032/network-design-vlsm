@@ -82,7 +82,7 @@ interfaces = [
 static_routes = [
   { to = "lion-lan", via = "R-Lion" },
 ]
-ospf = { process = 1, router_id = "2.2.2.2", area = 0, networks = ["elephant-lan", "elephant-cat", "elephant-dog"], passive = ["GigabitEthernet0/0/0"], redistribute = ["static"] }
+ospf = { process = 1, router_id = "2.2.2.2", area = 0, networks = ["elephant-lan", "elephant-cat", "elephant-dog"], passive = ["GigabitEthernet0/0/0"], redistribute = ["static", "connected"] }
 
 [[routers]]
 hostname = "R-Cat"

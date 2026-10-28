@@ -133,6 +133,7 @@ O    10.0.0.0/21 via 10.0.12.149
 C    10.0.8.0/22 directly connected
 O    10.0.12.0/25 via 10.0.12.149
 O E2 10.0.12.128/28 via 10.0.12.149
+O E2 10.0.12.144/30 via 10.0.12.149
 C    10.0.12.148/30 directly connected
 O    10.0.12.152/30 via 10.0.12.149
 ```
@@ -144,6 +145,7 @@ C    10.0.0.0/21 directly connected
 O    10.0.8.0/22 via 10.0.12.153
 O    10.0.12.0/25 via 10.0.12.153
 O E2 10.0.12.128/28 via 10.0.12.153
+O E2 10.0.12.144/30 via 10.0.12.153
 O    10.0.12.148/30 via 10.0.12.153
 C    10.0.12.152/30 directly connected
 ```
@@ -154,19 +156,12 @@ Rows are sources, columns destinations. Each cell traces both the echo request a
 
 | From \ To | Dog Tribe | Cat Tribe | Elephant Tribe | Lion Tribe | Lion-Elephant | Elephant-Cat | Elephant-Dog |
 |---|---|---|---|---|---|---|---|
-| **Dog Tribe** | · | ✅ | ✅ | ✅ | ❌ | ✅ | ✅ |
-| **Cat Tribe** | ✅ | · | ✅ | ✅ | ❌ | ✅ | ✅ |
+| **Dog Tribe** | · | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| **Cat Tribe** | ✅ | · | ✅ | ✅ | ✅ | ✅ | ✅ |
 | **Elephant Tribe** | ✅ | ✅ | · | ✅ | ✅ | ✅ | ✅ |
 | **Lion Tribe** | ✅ | ✅ | ✅ | · | ✅ | ✅ | ✅ |
-| **Lion-Elephant** | ❌ | ❌ | ✅ | ✅ | · | ✅ | ✅ |
+| **Lion-Elephant** | ✅ | ✅ | ✅ | ✅ | · | ✅ | ✅ |
 | **Elephant-Cat** | ✅ | ✅ | ✅ | ✅ | ✅ | · | ✅ |
 | **Elephant-Dog** | ✅ | ✅ | ✅ | ✅ | ✅ | ✅ | · |
 
-**LAN to LAN reachability: PASS**
-
-### Unreachable pairs
-
-- Dog Tribe → Lion-Elephant: R-Dog => 10.0.12.145: no route
-- Cat Tribe → Lion-Elephant: R-Cat => 10.0.12.145: no route
-- Lion-Elephant → Dog Tribe: R-Dog => 10.0.12.145: no route
-- Lion-Elephant → Cat Tribe: R-Cat => 10.0.12.145: no route
+**Every subnet reaches every subnet: PASS**

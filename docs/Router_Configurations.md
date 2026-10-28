@@ -124,6 +124,7 @@ ip route 10.0.12.128 255.255.255.240 10.0.12.145
 ! Redistribute static routes into OSPF so Cat/Dog can reach Lion
 router ospf 1
  redistribute static subnets
+ redistribute connected subnets
  exit
 
 ! ============================================
@@ -285,7 +286,7 @@ ping 10.0.12.133    ! Ping DHCP Server
 ### R-Elephant (OSPF + Static)
 - **Interfaces**: Gi0/0/0 (to Lion), Gi0/1 (to Cat), Gi0/2 (to Dog), Gi0/0 (LAN)
 - **Routing**: OSPF for Cat/Dog/Elephant networks, Static for Lion
-- **Special**: DHCP relay, redistributes static routes into OSPF
+- **Special**: DHCP relay, redistributes static and connected routes into OSPF
 
 ### R-Cat (OSPF)
 - **Interfaces**: Gi0/0 (to Elephant), Gi0/1 (LAN)

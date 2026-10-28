@@ -59,7 +59,7 @@ jobs:
           python-version: "3.13"
       - run: pip install .
       # Fails if configs/ or docs/generated/ drift from network.toml,
-      # or if any tribe LAN cannot reach another in the routing simulation.
+      # or if any subnet cannot reach another in the routing simulation.
       - run: vlsmkit check
       - name: Reachability report
         run: |

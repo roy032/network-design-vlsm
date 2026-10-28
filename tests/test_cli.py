@@ -62,7 +62,8 @@ def test_build_then_check_and_detect_drift(
 
 def test_check_fails_on_unreachable_lan(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     spec = tmp_path / "network.toml"
-    spec.write_text(SPEC.read_text().replace('redistribute = ["static"]', "redistribute = []"))
+    original = 'redistribute = ["static", "connected"]'
+    spec.write_text(SPEC.read_text().replace(original, "redistribute = []"))
     main(["build", "--spec", str(spec), "--out", str(tmp_path)])
     capsys.readouterr()
     assert main(["check", "--spec", str(spec), "--out", str(tmp_path)]) == 1
@@ -80,7 +81,14 @@ def test_invalid_spec_exit_code(tmp_path: Path, capsys: pytest.CaptureFixture[st
 def test_ping_and_routes(capsys: pytest.CaptureFixture[str]) -> None:
     assert main(["ping", "10.0.0.2", "10.0.12.130", "--spec", str(SPEC)]) == 0
     assert "R-Dog -> R-Elephant -> R-Lion" in capsys.readouterr().out
-    assert main(["ping", "10.0.0.2", "10.0.12.145", "--spec", str(SPEC)]) == 1
+    assert main(["ping", "10.0.0.2", "10.0.12.145", "--spec", str(SPEC)]) == 0
     assert main(["routes", "R-Cat", "--spec", str(SPEC)]) == 0
     assert "O E2 10.0.12.128/28" in capsys.readouterr().out
     assert main(["routes", "R-Nope", "--spec", str(SPEC)]) == 2
+
+
+def test_ping_failure_exit_code(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    spec = tmp_path / "network.toml"
+    spec.write_text(SPEC.read_text().replace('["static", "connected"]', '["static"]'))
+    assert main(["ping", "10.0.0.2", "10.0.12.145", "--spec", str(spec)]) == 1
+    assert "no route" in capsys.readouterr().out
